@@ -4,7 +4,7 @@ A console application for a small library desk: manage books, DVDs and magazines
 register members, lend and return items, and calculate late fees. Data is saved to a JSON file
 between runs.
 
-**Contributors:** <Saad>
+**Contributors:** **<Saad>**
 
 ## Problem statement
 Small libraries often track loans on paper. Librarians need to know which items are available,
