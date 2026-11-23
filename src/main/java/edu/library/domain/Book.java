@@ -1,5 +1,7 @@
 package edu.library.domain;
 
+import java.util.Map;
+
 public class Book extends LibraryItem {
     private final String author;
 
@@ -33,7 +35,7 @@ public class Book extends LibraryItem {
     }
 
     @Override
-    public String getExtraField() {
-        return author;
+    protected void addJsonFields(Map<String, Object> json) {
+        json.put("author", author);
     }
 }

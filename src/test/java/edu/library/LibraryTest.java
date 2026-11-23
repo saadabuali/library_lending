@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 
 import edu.library.domain.Book;
 import edu.library.domain.Dvd;
+import edu.library.domain.JsonSerializable;
 import edu.library.domain.LibraryItem;
 import edu.library.domain.Magazine;
 import edu.library.domain.Member;
@@ -29,6 +30,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -206,5 +208,32 @@ public class LibraryTest {
         JsonFileStorage storage = new JsonFileStorage(file);
         storage.save(lib);
         assertEquals("He said \"hi\" | back\\slash \u00e9\u00fc", storage.load().getItems().getById("B9").getTitle());
+    }
+
+    // ---- object-oriented JSON: every object writes itself
+    @Test
+    public void itemsDescribeThemselvesPolymorphically() throws LibraryException {
+        List<JsonSerializable> things = new ArrayList<>(library.getItems().all());
+        Map<String, Object> book = things.get(0).toJson();
+        Map<String, Object> dvd = things.get(1).toJson();
+        Map<String, Object> magazine = things.get(2).toJson();
+        assertEquals("BOOK", book.get("type"));
+        assertEquals("Robert Martin", book.get("author"));
+        assertEquals("DVD", dvd.get("type"));
+        assertEquals(136, dvd.get("durationMinutes"));
+        assertFalse(dvd.containsKey("author"));
+        assertEquals("MAGAZINE", magazine.get("type"));
+        assertEquals(12, magazine.get("issueNumber"));
+    }
+
+    @Test
+    public void memberAndLoanDescribeThemselves() throws LibraryException {
+        library.checkOut("U002", "D001", day);
+        Map<String, Object> member = library.getMembers().getById("U002").toJson();
+        assertEquals("STUDENT", member.get("type"));
+        Map<String, Object> loan = library.activeLoans().get(0).toJson();
+        assertEquals("U002", loan.get("memberId"));
+        assertEquals("D001", loan.get("itemId"));
+        assertEquals("2026-11-01", loan.get("loanDate"));
     }
 }

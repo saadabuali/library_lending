@@ -2,8 +2,8 @@ package edu.library.persistence;
 
 import edu.library.domain.Book;
 import edu.library.domain.Dvd;
+import edu.library.domain.JsonSerializable;
 import edu.library.domain.LibraryItem;
-import edu.library.domain.Loan;
 import edu.library.domain.Magazine;
 import edu.library.domain.Member;
 import edu.library.domain.MembershipType;
@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,42 +42,10 @@ public class JsonFileStorage implements LibraryStorage {
 
     @Override
     public void save(Library library) throws StorageException {
-        List<Object> items = new ArrayList<>();
-        for (LibraryItem i : library.getItems().all()) {
-            Map<String, Object> o = new LinkedHashMap<>();
-            o.put("type", i.getTypeName().toUpperCase());
-            o.put("id", i.getId());
-            o.put("title", i.getTitle());
-            o.put("year", i.getYear());
-            if (i instanceof Book b) {
-                o.put("author", b.getAuthor());
-            } else if (i instanceof Dvd d) {
-                o.put("durationMinutes", d.getDurationMinutes());
-            } else if (i instanceof Magazine m) {
-                o.put("issueNumber", m.getIssueNumber());
-            }
-            items.add(o);
-        }
-        List<Object> members = new ArrayList<>();
-        for (Member m : library.getMembers().all()) {
-            Map<String, Object> o = new LinkedHashMap<>();
-            o.put("id", m.getId());
-            o.put("name", m.getName());
-            o.put("type", m.getType().name());
-            members.add(o);
-        }
-        List<Object> loans = new ArrayList<>();
-        for (Loan l : library.activeLoans()) {
-            Map<String, Object> o = new LinkedHashMap<>();
-            o.put("memberId", l.getMember().getId());
-            o.put("itemId", l.getItem().getId());
-            o.put("loanDate", l.getLoanDate().toString());
-            loans.add(o);
-        }
         Map<String, Object> root = new LinkedHashMap<>();
-        root.put("items", items);
-        root.put("members", members);
-        root.put("loans", loans);
+        root.put("items", toJsonList(library.getItems().all()));
+        root.put("members", toJsonList(library.getMembers().all()));
+        root.put("loans", toJsonList(library.activeLoans()));
 
         try {
             Path parent = file.toAbsolutePath().getParent();
@@ -89,6 +56,11 @@ public class JsonFileStorage implements LibraryStorage {
         } catch (IOException e) {
             throw new StorageException("Could not save data to " + file, e);
         }
+    }
+
+    /** Every object writes itself; this method does not care which concrete type it is. */
+    private static List<Object> toJsonList(List<? extends JsonSerializable> objects) {
+        return objects.stream().<Object>map(JsonSerializable::toJson).toList();
     }
 
     /** Returns an empty library if the file does not exist yet. */
