@@ -1,0 +1,18 @@
+# Build output
+target/
+out/
+*.class
+*.jar
+
+# IDE metadata
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Local data and secrets
+data/
+*.env
+.DS_Store
