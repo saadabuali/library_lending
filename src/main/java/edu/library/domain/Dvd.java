@@ -1,5 +1,7 @@
 package edu.library.domain;
 
+import java.util.Map;
+
 public class Dvd extends LibraryItem {
     private final int durationMinutes;
 
@@ -33,7 +35,7 @@ public class Dvd extends LibraryItem {
     }
 
     @Override
-    public String getExtraField() {
-        return String.valueOf(durationMinutes);
+    protected void addJsonFields(Map<String, Object> json) {
+        json.put("durationMinutes", durationMinutes);
     }
 }

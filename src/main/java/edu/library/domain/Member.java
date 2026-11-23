@@ -2,10 +2,12 @@ package edu.library.domain;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /** A library member. Owns (composition) the list of their active loans. */
-public class Member implements Identifiable {
+public class Member implements Identifiable, JsonSerializable {
     public static final int MAX_LOANS = 3;
 
     private final String id;
@@ -50,6 +52,15 @@ public class Member implements Identifiable {
 
     public void removeLoan(Loan loan) {
         activeLoans.remove(loan);
+    }
+
+    @Override
+    public Map<String, Object> toJson() {
+        Map<String, Object> json = new LinkedHashMap<>();
+        json.put("id", id);
+        json.put("name", name);
+        json.put("type", type.name());
+        return json;
     }
 
     @Override

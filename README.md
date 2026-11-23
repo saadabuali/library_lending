@@ -44,13 +44,13 @@ late DVD borrowed by the student: the fee halves.
 | Requirement | Where |
 |---|---|
 | Encapsulation | Private fields everywhere; constructors validate (`LibraryItem`, `Member`, `Loan`); `Member.getActiveLoans()` returns an unmodifiable list |
-| Abstraction | Interfaces `Lendable`, `Identifiable`, `FeePolicy`, `LibraryListener`, `LibraryStorage`; abstract class `LibraryItem` |
+| Abstraction | Interfaces `Lendable`, `Identifiable`, `JsonSerializable`, `FeePolicy`, `LibraryListener`, `LibraryStorage`; abstract class `LibraryItem` |
 | Inheritance + polymorphism | `Book`, `Dvd`, `Magazine` extend `LibraryItem` and override loan period, late fee and details; fee policy is swapped at runtime |
 | Relationships | Library ◇ Registry (aggregation), Member ◆ Loan (composition, 1 to 0..*), Loan → Item / Member (association) – see `docs/class-diagram.md` |
 | Collections + generics | `ArrayList`, custom generic `Registry<T extends Identifiable>`; sorting with `Comparable` (`LibraryItem`), `Comparator` and lambdas (`Library.itemsSortedByYear`) |
 | Exceptions | Custom checked: `LibraryException` and subclasses (`ItemUnavailableException`, `LoanLimitExceededException`, `EntityNotFoundException`, `StorageException`); unchecked `ValidationException` |
-| Persistence | `JsonFileStorage` reads/writes `data/library.json` |
-| Testing | `src/test/java/edu/library/LibraryTest.java` (JUnit 4, 14 tests) |
+| Persistence | `JsonFileStorage` reads/writes `data/library.json`; each domain object writes itself through `JsonSerializable.toJson()` (no `instanceof` in the storage layer) |
+| Testing | `src/test/java/edu/library/LibraryTest.java` (JUnit 4, 18 tests) |
 | Build | Maven (`pom.xml`) |
 
 ## Design patterns

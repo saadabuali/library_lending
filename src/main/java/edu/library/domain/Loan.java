@@ -2,9 +2,11 @@ package edu.library.domain;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /** One member borrowing one item. Immutable once created. */
-public class Loan {
+public class Loan implements JsonSerializable {
     private final Member member;
     private final LibraryItem item;
     private final LocalDate loanDate;
@@ -40,6 +42,16 @@ public class Loan {
     public int daysOverdue(LocalDate returnDate) {
         long days = ChronoUnit.DAYS.between(dueDate, returnDate);
         return (int) Math.max(0, days);
+    }
+
+    /** Only the references and the loan date are stored; the due date is recalculated on load. */
+    @Override
+    public Map<String, Object> toJson() {
+        Map<String, Object> json = new LinkedHashMap<>();
+        json.put("memberId", member.getId());
+        json.put("itemId", item.getId());
+        json.put("loanDate", loanDate.toString());
+        return json;
     }
 
     @Override

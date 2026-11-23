@@ -1,10 +1,14 @@
 package edu.library.domain;
 
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+
 /**
  * Abstract parent of everything in the catalogue.
  * Natural ordering is alphabetical by title (Comparable).
  */
-public abstract class LibraryItem implements Lendable, Identifiable, Comparable<LibraryItem> {
+public abstract class LibraryItem implements Lendable, Identifiable, JsonSerializable, Comparable<LibraryItem> {
     private final String id;
     private final String title;
     private final int year;
@@ -46,8 +50,23 @@ public abstract class LibraryItem implements Lendable, Identifiable, Comparable<
     /** Type-specific detail shown in listings (author, duration, issue...). */
     public abstract String getDetails();
 
-    /** Type-specific value written to the data file. */
-    public abstract String getExtraField();
+    /**
+     * Template method: writes the fields every item has, then lets the subclass add its own
+     * through {@link #addJsonFields(Map)}.
+     */
+    @Override
+    public final Map<String, Object> toJson() {
+        Map<String, Object> json = new LinkedHashMap<>();
+        json.put("type", getTypeName().toUpperCase(Locale.ROOT));
+        json.put("id", id);
+        json.put("title", title);
+        json.put("year", year);
+        addJsonFields(json);
+        return json;
+    }
+
+    /** Subclass hook: add the type-specific fields (author, duration, issue number...). */
+    protected abstract void addJsonFields(Map<String, Object> json);
 
     @Override
     public int compareTo(LibraryItem other) {

@@ -11,6 +11,10 @@ classDiagram
         <<interface>>
         +getId() String
     }
+    class JsonSerializable {
+        <<interface>>
+        +toJson() Map
+    }
     class Lendable {
         <<interface>>
         +getLoanPeriodDays() int
@@ -28,7 +32,8 @@ classDiagram
         +markReturned()
         +isAvailable() boolean
         +getDetails()* String
-        +getExtraField()* String
+        +toJson() Map
+        #addJsonFields(json)* void
         +compareTo(other) int
     }
     class Book {
@@ -56,6 +61,7 @@ classDiagram
         +addLoan(loan)
         +removeLoan(loan)
         +getActiveLoans() List~Loan~
+        +toJson() Map
     }
     class MembershipType {
         <<enumeration>>
@@ -66,6 +72,7 @@ classDiagram
         -loanDate : LocalDate
         -dueDate : LocalDate
         +daysOverdue(returnDate) int
+        +toJson() Map
     }
     class Registry~T extends Identifiable~ {
         -entries : List~T~
@@ -139,6 +146,9 @@ classDiagram
 
     Lendable <|.. LibraryItem
     Identifiable <|.. LibraryItem
+    JsonSerializable <|.. LibraryItem
+    JsonSerializable <|.. Member
+    JsonSerializable <|.. Loan
     Identifiable <|.. Member
     LibraryItem <|-- Book
     LibraryItem <|-- Dvd

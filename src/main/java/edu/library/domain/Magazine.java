@@ -1,5 +1,7 @@
 package edu.library.domain;
 
+import java.util.Map;
+
 public class Magazine extends LibraryItem {
     private final int issueNumber;
 
@@ -33,7 +35,7 @@ public class Magazine extends LibraryItem {
     }
 
     @Override
-    public String getExtraField() {
-        return String.valueOf(issueNumber);
+    protected void addJsonFields(Map<String, Object> json) {
+        json.put("issueNumber", issueNumber);
     }
 }
